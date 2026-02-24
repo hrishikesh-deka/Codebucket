@@ -17,13 +17,15 @@ export class RepositoriesController {
     @Post('upload')
     @UseInterceptors(FileInterceptor('file'))
     async uploadRepository(
-        @UploadedFile() file: Express.Multer.File,
+        @UploadedFile() file: Express.Multer.File | undefined,
         @Body('name') name: string,
         @Body('description') description: string,
         @Body('visibility') visibility: string,
+        @Body('owner') owner: string,
+        @Body('githubUrl') githubUrl: string,
     ) {
-        if (!file) {
-            throw new BadRequestException('A zip file is required.');
+        if (!file && !githubUrl) {
+            throw new BadRequestException('A zip file or a GitHub URL is required.');
         }
         if (!name) {
             throw new BadRequestException('Repository name is required.');
@@ -33,7 +35,9 @@ export class RepositoriesController {
             name,
             description || '',
             visibility || 'public',
+            owner || 'unknown',
             file,
+            githubUrl,
         );
     }
 

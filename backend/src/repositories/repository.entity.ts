@@ -14,6 +14,9 @@ export class Repository {
     @Column({ default: 'public' })
     visibility: string;
 
+    @Column({ default: 'unknown' })
+    owner: string;
+
     @Column()
     storagePath: string;
 

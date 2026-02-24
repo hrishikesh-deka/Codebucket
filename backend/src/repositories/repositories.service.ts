@@ -21,7 +21,9 @@ export class RepositoriesService {
         name: string,
         description: string,
         visibility: string,
-        file: Express.Multer.File,
+        owner: string,
+        file?: Express.Multer.File,
+        githubUrl?: string,
     ): Promise<Repository> {
         const reposDir = path.join(process.cwd(), 'git-storage');
         if (!fs.existsSync(reposDir)) {
@@ -33,26 +35,33 @@ export class RepositoriesService {
         const bareRepoPath = path.join(reposDir, `${uniqueRepoName}.git`);
 
         try {
-            // 1. Extract ZIP file
-            const zip = new AdmZip(file.buffer);
-            zip.extractAllTo(extractPath, true);
+            if (githubUrl) {
+                // Determine if it's already a bare clone or needs one, straightforward bare clone works best
+                await execAsync(`git clone --bare "${githubUrl}" "${bareRepoPath}"`);
+            } else if (file) {
+                // 1. Extract ZIP file
+                const zip = new AdmZip(file.buffer);
+                zip.extractAllTo(extractPath, true);
 
-            // 2. Initialize a local git repository in extracted folder
-            await execAsync(`git init`, { cwd: extractPath });
-            await execAsync(`git add .`, { cwd: extractPath });
-            await execAsync(`git commit -m "Initial commit from CodeBucket upload"`, {
-                cwd: extractPath,
-                env: { ...process.env, GIT_AUTHOR_NAME: 'CodeBucket', GIT_AUTHOR_EMAIL: 'noreply@codebucket.local', GIT_COMMITTER_NAME: 'CodeBucket', GIT_COMMITTER_EMAIL: 'noreply@codebucket.local' },
-            });
+                // 2. Initialize a local git repository in extracted folder
+                await execAsync(`git init`, { cwd: extractPath });
+                await execAsync(`git add .`, { cwd: extractPath });
+                await execAsync(`git commit -m "Initial commit from CodeBucket upload"`, {
+                    cwd: extractPath,
+                    env: { ...process.env, GIT_AUTHOR_NAME: 'CodeBucket', GIT_AUTHOR_EMAIL: 'noreply@codebucket.local', GIT_COMMITTER_NAME: 'CodeBucket', GIT_COMMITTER_EMAIL: 'noreply@codebucket.local' },
+                });
 
-            // 3. Clone it to a bare repository
-            await execAsync(`git clone --bare . "${bareRepoPath}"`, { cwd: extractPath });
+                // 3. Clone it to a bare repository
+                await execAsync(`git clone --bare . "${bareRepoPath}"`, { cwd: extractPath });
 
-            // Clean up extracted files
-            try {
-                fs.rmSync(extractPath, { recursive: true, force: true });
-            } catch (cleanupErr) {
-                console.warn('Failed to clean up extract path after success:', cleanupErr);
+                // Clean up extracted files
+                try {
+                    fs.rmSync(extractPath, { recursive: true, force: true });
+                } catch (cleanupErr) {
+                    console.warn('Failed to clean up extract path after success:', cleanupErr);
+                }
+            } else {
+                throw new InternalServerErrorException('Neither file nor githubUrl provided.');
             }
 
             // 4. Save metadata
