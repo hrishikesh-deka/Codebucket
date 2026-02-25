@@ -1,0 +1,73 @@
+{
+    "family": "app-prod-task",
+    "networkMode": "awsvpc",
+    "containerDefinitions": [
+        {
+            "name": "frontend-nginx",
+            "image": "<ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/app-frontend-prod:latest",
+            "portMappings": [
+                {
+                    "containerPort": 80
+                }
+            ],
+            "dependsOn": [
+                {
+                    "containerName": "backend",
+                    "condition": "HEALTHY"
+                }
+            ],
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost:80 || exit 1"
+                ],
+                "interval": 30,
+                "timeout": 5,
+                "retries": 3
+            }
+        },
+        {
+            "name": "backend",
+            "image": "<ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/app-backend:latest",
+            "portMappings": [
+                {
+                    "containerPort": 3000
+                }
+            ],
+            "dependsOn": [
+                {
+                    "containerName": "db",
+                    "condition": "HEALTHY"
+                }
+            ],
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost:3000/health || exit 1"
+                ],
+                "interval": 30,
+                "timeout": 5,
+                "retries": 3,
+                "startPeriod": 60
+            }
+        },
+        {
+            "name": "db",
+            "image": "public.ecr.aws/docker/library/postgres:15-alpine",
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "pg_isready -U postgres"
+                ],
+                "interval": 10,
+                "timeout": 5,
+                "retries": 5
+            }
+        }
+    ],
+    "cpu": "1024",
+    "memory": "4096",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ]
+}
