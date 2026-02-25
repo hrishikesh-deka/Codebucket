@@ -5,6 +5,8 @@ import { RepositoriesModule } from './repositories/repositories.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Repository } from './repositories/repository.entity';
+import { UsersModule } from './users/users.module';
+import { User } from './users/user.entity';
 
 @Module({
   imports: [
@@ -18,12 +20,13 @@ import { Repository } from './repositories/repository.entity';
         username: configService.get<string>('POSTGRES_USER', 'postgres'),
         password: configService.get<string>('POSTGRES_PASSWORD', 'postgres'),
         database: configService.get<string>('POSTGRES_DATABASE', 'codebucket'),
-        entities: [Repository],
+        entities: [Repository, User],
         synchronize: true, // Auto-create tables (Dev only)
       }),
       inject: [ConfigService],
     }),
     RepositoriesModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

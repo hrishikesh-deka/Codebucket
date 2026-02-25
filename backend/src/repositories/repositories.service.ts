@@ -36,8 +36,15 @@ export class RepositoriesService {
 
         try {
             if (githubUrl) {
+                let cleanUrl = githubUrl.trim();
+                if (cleanUrl.toLowerCase().startsWith('git clone ')) {
+                    cleanUrl = cleanUrl.replace(/^git\s+clone\s+/i, '').trim();
+                }
+                // Remove any surrounding single or double quotes
+                cleanUrl = cleanUrl.replace(/^['"]|['"]$/g, '');
+
                 // Determine if it's already a bare clone or needs one, straightforward bare clone works best
-                await execAsync(`git clone --bare "${githubUrl}" "${bareRepoPath}"`);
+                await execAsync(`git clone --bare "${cleanUrl}" "${bareRepoPath}"`);
             } else if (file) {
                 // 1. Extract ZIP file
                 const zip = new AdmZip(file.buffer);
@@ -85,7 +92,17 @@ export class RepositoriesService {
         }
     }
 
-    async findAll(): Promise<Repository[]> {
-        return this.repositoryRepo.find();
+    async findAll(
+        page: number = 1,
+        limit: number = 10,
+        sort: string = 'createdAt',
+        order: 'ASC' | 'DESC' = 'DESC'
+    ): Promise<{ data: Repository[], total: number }> {
+        const [data, total] = await this.repositoryRepo.findAndCount({
+            skip: (page - 1) * limit,
+            take: limit,
+            order: { [sort]: order },
+        });
+        return { data, total };
     }
 }

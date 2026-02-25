@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
 import './NewRepository.css';
 
-function NewRepository({ onCancel, onCreateSuccess }) {
-    const [owner, setOwner] = useState('MyCompany');
+function NewRepository({ onCancel, onCreateSuccess, userEmail }) {
+    const defaultOwner = userEmail ? userEmail.split('@')[0] : 'MyCompany';
+    const [owner, setOwner] = useState(defaultOwner);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [visibility, setVisibility] = useState('public');
@@ -173,40 +174,7 @@ function NewRepository({ onCancel, onCreateSuccess }) {
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label>Visibility</label>
-                        <div className="visibility-options">
-                            <label className={`radio-card ${visibility === 'public' ? 'selected' : ''}`}>
-                                <input
-                                    type="radio"
-                                    name="visibility"
-                                    value="public"
-                                    checked={visibility === 'public'}
-                                    onChange={() => setVisibility('public')}
-                                    disabled={isLoading}
-                                />
-                                <div className="radio-content">
-                                    <h4>Public</h4>
-                                    <p>Anyone on the internet can see this repository. You choose who can commit.</p>
-                                </div>
-                            </label>
 
-                            <label className={`radio-card ${visibility === 'private' ? 'selected' : ''}`}>
-                                <input
-                                    type="radio"
-                                    name="visibility"
-                                    value="private"
-                                    checked={visibility === 'private'}
-                                    onChange={() => setVisibility('private')}
-                                    disabled={isLoading}
-                                />
-                                <div className="radio-content">
-                                    <h4>Private</h4>
-                                    <p>You choose who can see and commit to this repository.</p>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
 
                     <div className="form-group">
                         <label>Import Method</label>

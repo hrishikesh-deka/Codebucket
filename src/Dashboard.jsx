@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 
-function Dashboard({ onSignOut, onNewRepo }) {
+function Dashboard({ onSignOut, onNewRepo, onBrowse, userEmail }) {
     const [repositories, setRepositories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -10,16 +10,18 @@ function Dashboard({ onSignOut, onNewRepo }) {
         fetch('http://localhost:3000/api/repositories')
             .then(res => res.json())
             .then(data => {
-                setRepositories(Array.isArray(data) ? data : []);
+                if (Array.isArray(data)) {
+                    setRepositories(data);
+                } else if (data && data.data) {
+                    setRepositories(data.data);
+                } else {
+                    setRepositories([]);
+                }
                 setIsLoading(false);
             })
             .catch(err => {
                 console.error("Failed to fetch repositories:", err);
-                // If backend is down, we use mockup data
-                setRepositories([
-                    { id: '1', name: 'backend-api', visibility: 'public', description: 'Core API services' },
-                    { id: '2', name: 'frontend-monorepo', visibility: 'private', description: 'React application' }
-                ]);
+                setRepositories([]);
                 setIsLoading(false);
             });
     }, []);
@@ -43,9 +45,6 @@ function Dashboard({ onSignOut, onNewRepo }) {
                     </div>
                     <div className="dash-links">
                         <a href="#" className="dash-link active">Dashboard</a>
-                        <a href="#" className="dash-link">Pull requests</a>
-                        <a href="#" className="dash-link">Issues</a>
-                        <a href="#" className="dash-link">Explore</a>
                     </div>
                 </div>
                 <div className="dash-nav-right">
@@ -92,147 +91,87 @@ function Dashboard({ onSignOut, onNewRepo }) {
                                         )}
                                     </div>
                                     <div className="repo-name">
-                                        <span className="repo-owner">company</span> / <span className="repo-repo" style={{ fontWeight: 600 }}>{repo.name}</span>
+                                        <span className="repo-owner">{repo.owner || 'unknown'}</span> / <span className="repo-repo" style={{ fontWeight: 600 }}>{repo.name}</span>
                                     </div>
                                 </div>
                             ))
                         )}
-                        <div className="repo-item" style={{ opacity: 0.7, marginTop: '0.5rem' }}>
+                        <div className="repo-item" style={{ opacity: 0.7, marginTop: '0.5rem', cursor: 'pointer' }} onClick={onBrowse}>
                             Show more
                         </div>
                     </div>
 
-                    <div className="dash-sidebar-header" style={{ marginTop: '2rem' }}>
-                        <h2 className="dash-sidebar-title">Recent activity</h2>
-                    </div>
-                    <div className="empty-state-small">
-                        When you have recent activity, it will show up here.
-                    </div>
                 </aside>
 
-                {/* Main Feed */}
+
+
+                {/* Main Dashboard Content */}
                 <main className="dash-main">
-                    <div className="feed-header">
-                        <h2>Home</h2>
-                        <div className="feed-filters">
-                            <button className="dash-btn active">For you</button>
-                            <button className="dash-btn">Following</button>
-                        </div>
-                    </div>
-
+                    {/* Welcome Section */}
                     <div className="dash-card">
-                        <h3 className="card-title">Discover interesting projects and people to populate your personal news feed.</h3>
-                        <p className="card-desc">Your news feed helps you keep up with recent activity on repositories you watch and people you follow.</p>
-                        <button className="btn btn-outline" style={{ marginTop: '1rem' }}>Explore CodeBucket</button>
+                        <h2 className="card-title">Welcome to CodeBucket{userEmail ? `, ${userEmail.split('@')[0]}` : ''}!</h2>
+                        <p className="card-desc" style={{ marginBottom: '1.5rem' }}>Your personal hub for sharing and browsing code.</p>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                            <button className="btn btn-primary" onClick={onNewRepo}>New Repository</button>
+                            <button className="btn btn-secondary" onClick={onBrowse}>Browse All</button>
+                        </div>
                     </div>
 
-                    <div className="feed-items">
-                        {/* Feed Item 1 */}
-                        <div className="feed-item">
-                            <div className="feed-icon-col">
-                                <div className="feed-avatar">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                </div>
-                            </div>
-                            <div className="feed-content">
-                                <div className="feed-meta">
-                                    <span className="feed-user">alex-dev</span> starred <span className="feed-target">open-source-hq/hyperion</span> <span className="feed-time">2 hours ago</span>
-                                </div>
-                                <div className="feed-repo-card">
-                                    <div className="feed-repo-header">
-                                        <h4>open-source-hq / hyperion</h4>
-                                        <button className="btn btn-secondary btn-sm" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                                            Star
-                                        </button>
-                                    </div>
-                                    <p className="feed-repo-desc">A blazing fast modern microservices framework built in Rust.</p>
-                                    <div className="feed-repo-stats">
-                                        <span className="lang-stat"><span className="lang-color rust"></span> Rust</span>
-                                        <span className="icon-stat"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> 12.4k</span>
-                                        <span className="feed-time">Updated Oct 24</span>
-                                    </div>
-                                </div>
-                            </div>
+                    {/* Repository Statistics */}
+                    <div className="dash-card" style={{ display: 'flex', justifyContent: 'space-around', padding: '1.5rem' }}>
+                        <div>
+                            <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>{repositories.length}</div>
+                            <div className="card-desc">Total Repositories</div>
                         </div>
-
-                        {/* Feed Item 2 */}
-                        <div className="feed-item">
-                            <div className="feed-icon-col">
-                                <div className="feed-avatar" style={{ background: '#2ea043' }}>
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                                </div>
+                        <div>
+                            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--text-accent)' }}>
+                                {repositories.filter(r => r.visibility === 'public').length}
                             </div>
-                            <div className="feed-content">
-                                <div className="feed-meta">
-                                    <span className="feed-user">sarah-engineer</span> created a repository <span className="feed-target">sarah-engineer/react-hooks-library</span> <span className="feed-time">5 hours ago</span>
-                                </div>
-                                <div className="feed-repo-card">
-                                    <div className="feed-repo-header">
-                                        <h4>sarah-engineer / react-hooks-library</h4>
-                                        <button className="btn btn-secondary btn-sm" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                                            Star
-                                        </button>
-                                    </div>
-                                    <p className="feed-repo-desc">A collection of custom React hooks for common use cases.</p>
-                                    <div className="feed-repo-stats">
-                                        <span className="lang-stat"><span className="lang-color ts"></span> TypeScript</span>
-                                        <span className="feed-time">Updated today</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <div className="card-desc">Public</div>
                         </div>
+                        <div>
+                            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--text-secondary)' }}>
+                                {repositories.filter(r => r.visibility === 'private').length}
+                            </div>
+                            <div className="card-desc">Private</div>
+                        </div>
+                    </div>
 
-                        <button className="btn btn-outline" style={{ width: '100%', marginTop: '1rem' }}>More activity</button>
+                    {/* Recent Activity */}
+                    <div className="feed-header" style={{ marginTop: '2rem' }}>
+                        <h2>Recent Activity</h2>
+                    </div>
+                    <div className="repo-list">
+                        {isLoading ? (
+                            <div className="empty-state-small">Loading activity...</div>
+                        ) : repositories.length === 0 ? (
+                            <div className="empty-state-small">
+                                No activity yet. <a href="#" onClick={(e) => { e.preventDefault(); onNewRepo(); }} style={{ color: 'var(--text-accent)' }}>Upload a repository</a> to get started.
+                            </div>
+                        ) : (
+                            // Sort by createdAt descending and take top 5
+                            [...repositories]
+                                .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+                                .slice(0, 5)
+                                .map(repo => (
+                                    <div className="feed-repo-card" key={`feed-${repo.id}`}>
+                                        <div className="feed-repo-header">
+                                            <h4 onClick={onBrowse}>{repo.owner || 'unknown'} / {repo.name}</h4>
+                                            <span className="visibility-badge" style={{ fontSize: '0.75rem', padding: '0.1rem 0.4rem' }}>{repo.visibility}</span>
+                                        </div>
+                                        {repo.description && <div className="feed-repo-desc">{repo.description}</div>}
+                                        <div className="feed-repo-stats">
+                                            <div className="icon-stat">
+                                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                {repo.createdAt ? new Date(repo.createdAt).toLocaleDateString() : 'Recently'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                        )}
                     </div>
                 </main>
 
-                {/* Right Sidebar */}
-                <aside className="dash-sidebar-right">
-                    <div className="explore-card">
-                        <h3>Explore Repositories</h3>
-
-                        <div className="explore-item">
-                            <div className="explore-header">
-                                <div className="explore-repo">tailwindlabs / tailwindcss</div>
-                            </div>
-                            <div className="explore-desc">A utility-first CSS framework for rapid UI development.</div>
-                            <div className="feed-repo-stats">
-                                <span className="lang-stat"><span className="lang-color js"></span> JavaScript</span>
-                                <span className="icon-stat"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> 73.1k</span>
-                            </div>
-                        </div>
-
-                        <div className="explore-item">
-                            <div className="explore-header">
-                                <div className="explore-repo">facebook / react</div>
-                            </div>
-                            <div className="explore-desc">The library for web and native user interfaces.</div>
-                            <div className="feed-repo-stats">
-                                <span className="lang-stat"><span className="lang-color js"></span> JavaScript</span>
-                                <span className="icon-stat"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> 214k</span>
-                            </div>
-                        </div>
-
-                        <a href="#" className="explore-more">Explore more →</a>
-                    </div>
-
-                    <div className="dash-footer-links">
-                        <a href="#">Blog</a> •
-                        <a href="#">About</a> •
-                        <a href="#">Shop</a> •
-                        <a href="#">Contact</a> •
-                        <a href="#">Pricing</a> •
-                        <a href="#">API</a> •
-                        <a href="#">Training</a> •
-                        <a href="#">Status</a> •
-                        <a href="#">Security</a> •
-                        <a href="#">Terms</a> •
-                        <a href="#">Privacy</a> •
-                        <a href="#">Docs</a>
-                    </div>
-                </aside>
             </div>
         </div>
     );

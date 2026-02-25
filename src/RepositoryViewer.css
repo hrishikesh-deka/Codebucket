@@ -1,0 +1,228 @@
+/* RepositoryViewer.css */
+
+.repo-viewer-container {
+    background-color: var(--bg-primary, #0d1117);
+    min-height: 100vh;
+    color: var(--text-primary, #e6edf3);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+.repo-viewer-loading,
+.repo-viewer-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 1rem;
+    color: var(--text-secondary, #8b949e);
+}
+
+.repo-viewer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Header */
+.repo-header {
+    margin-bottom: 2rem;
+}
+
+.repo-title {
+    display: flex;
+    align-items: center;
+    font-size: 1.25rem;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.repo-icon {
+    color: var(--text-secondary, #8b949e);
+}
+
+.repo-title .owner {
+    color: #58a6ff;
+    cursor: pointer;
+}
+
+.repo-title .owner:hover {
+    text-decoration: underline;
+}
+
+.repo-title .separator {
+    color: var(--text-secondary, #8b949e);
+}
+
+.repo-title .name {
+    color: #58a6ff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.repo-title .name:hover {
+    text-decoration: underline;
+}
+
+.repo-description {
+    color: var(--text-secondary, #8b949e);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* Breadcrumbs Map */
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: rgba(48, 54, 61, 0.2);
+    border-bottom: 1px solid var(--border-color, #30363d);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.breadcrumb-part {
+    color: #58a6ff;
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 0.2rem 0.4rem;
+    margin: -0.2rem 0;
+}
+
+.breadcrumb-part:hover:not(.breadcrumb-current) {
+    background: rgba(88, 166, 255, 0.1);
+    text-decoration: underline;
+}
+
+.breadcrumb-separator {
+    color: var(--text-secondary, #8b949e);
+    margin: 0 0.2rem;
+}
+
+.breadcrumb-current {
+    color: var(--text-primary, #e6edf3);
+    cursor: default;
+    font-weight: 600;
+}
+
+.repo-root {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+}
+
+/* File Explorer Container */
+.file-explorer-card {
+    background: var(--bg-secondary, #161b22);
+    border: 1px solid var(--border-color, #30363d);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+/* File Tree */
+.file-tree-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.file-tree-item {
+    display: flex;
+    align-items: center;
+    padding: 0.6rem 1.5rem;
+    border-bottom: 1px solid var(--border-color, #30363d);
+    transition: background 0.15s ease;
+}
+
+.file-tree-item:last-child {
+    border-bottom: none;
+}
+
+.file-tree-item:hover {
+    background: rgba(48, 54, 61, 0.5);
+}
+
+.file-icon {
+    width: 24px;
+    display: flex;
+    justify-content: center;
+    margin-right: 0.5rem;
+}
+
+.file-name {
+    flex: 1;
+    color: var(--text-primary, #e6edf3);
+    cursor: pointer;
+}
+
+.file-name:hover {
+    color: #58a6ff;
+    text-decoration: underline;
+}
+
+.file-meta {
+    color: var(--text-secondary, #8b949e);
+    font-size: 0.85rem;
+    text-align: right;
+}
+
+.tree-loading,
+.tree-error,
+.tree-empty {
+    padding: 3rem;
+    text-align: center;
+    color: var(--text-secondary, #8b949e);
+}
+
+/* File Blob / Viewer */
+.file-blob-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: var(--bg-secondary, #161b22);
+    border-bottom: 1px solid var(--border-color, #30363d);
+    border-top: 1px solid var(--border-color, #30363d);
+    /* Added to separate from breadcrumbs visually */
+}
+
+.file-blob-header .file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary, #e6edf3);
+}
+
+.file-blob-header .file-size {
+    font-weight: normal;
+    color: var(--text-secondary, #8b949e);
+    margin-left: 0.5rem;
+}
+
+.file-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.file-blob-content {
+    background: var(--bg-primary, #0d1117);
+    padding: 1rem;
+    overflow-x: auto;
+}
+
+.file-blob-content pre {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-primary, #e6edf3);
+    tab-size: 4;
+}
+
+.blob-loading,
+.blob-error {
+    padding: 3rem;
+    text-align: center;
+    color: var(--text-secondary, #8b949e);
+}

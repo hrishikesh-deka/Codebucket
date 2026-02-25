@@ -1,0 +1,210 @@
+.browse-repos-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+.browse-repos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.browse-repos-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary, #e6edf3);
+    margin: 0;
+}
+
+.browse-repos-card {
+    background: var(--bg-secondary, #161b22);
+    border: 1px solid var(--border-color, #30363d);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.table-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(22, 27, 34, 0.5);
+    border-bottom: 1px solid var(--border-color, #30363d);
+}
+
+.search-input-wrapper {
+    position: relative;
+    width: 300px;
+}
+
+.search-input-wrapper svg {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary, #8b949e);
+}
+
+.search-input-wrapper input {
+    width: 100%;
+    padding: 0.4rem 0.4rem 0.4rem 2rem;
+    background-color: var(--bg-primary, #0d1117);
+    border: 1px solid var(--border-color, #30363d);
+    border-radius: 6px;
+    color: var(--text-primary, #e6edf3);
+    font-size: 0.85rem;
+}
+
+.search-input-wrapper input:focus {
+    outline: none;
+    border-color: #58a6ff;
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+}
+
+.repos-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.repos-table th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--text-secondary, #8b949e);
+    border-bottom: 1px solid var(--border-color, #30363d);
+    background: rgba(48, 54, 61, 0.2);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s ease;
+}
+
+.repos-table th:hover {
+    background: rgba(48, 54, 61, 0.4);
+}
+
+.repos-table th .sort-icon {
+    margin-left: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    opacity: 0.5;
+}
+
+.repos-table th.active-sort .sort-icon {
+    opacity: 1;
+    color: var(--text-primary, #e6edf3);
+}
+
+.repos-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color, #30363d);
+}
+
+.repos-table tr:last-child td {
+    border-bottom: none;
+}
+
+.repos-table tr:hover {
+    background: rgba(22, 27, 34, 0.8);
+}
+
+.repo-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.repo-name-text {
+    font-weight: 600;
+    color: #58a6ff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.repo-name-text:hover {
+    text-decoration: underline;
+}
+
+.repo-owner-text {
+    color: var(--text-secondary, #8b949e);
+    font-weight: normal;
+}
+
+.visibility-badge {
+    font-size: 0.75rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 2em;
+    border: 1px solid var(--border-color, #30363d);
+    color: var(--text-secondary, #8b949e);
+    display: inline-block;
+    margin-top: 0.25rem;
+}
+
+.repo-desc-cell {
+    color: var(--text-secondary, #8b949e);
+    font-size: 0.85rem;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.repo-date-cell {
+    color: var(--text-secondary, #8b949e);
+    font-size: 0.85rem;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(22, 27, 34, 0.5);
+    border-top: 1px solid var(--border-color, #30363d);
+}
+
+.pagination-info {
+    font-size: 0.85rem;
+    color: var(--text-secondary, #8b949e);
+}
+
+.pagination-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.page-btn {
+    background: var(--bg-primary, #0d1117);
+    border: 1px solid var(--border-color, #30363d);
+    color: var(--text-primary, #e6edf3);
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: rgba(48, 54, 61, 0.5);
+    border-color: #8b949e;
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.loading-state,
+.error-state,
+.empty-state {
+    padding: 3rem;
+    text-align: center;
+    color: var(--text-secondary, #8b949e);
+}
+
+.error-state {
+    color: #ff7b72;
+}

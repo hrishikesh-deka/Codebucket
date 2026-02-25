@@ -1,13 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import Dashboard from './Dashboard';
 import NewRepository from './NewRepository';
+import BrowseRepositories from './BrowseRepositories';
+import RepositoryViewer from './RepositoryViewer';
+import Login from './Login';
 import './index.css';
 
 function App() {
   const [scrolled, setScrolled] = useState(false);
-  const [view, setView] = useState('landing'); // 'landing' | 'dashboard' | 'new_repo'
+  const [view, setView] = useState('landing'); // 'landing' | 'dashboard' | 'new_repo' | 'login' | 'browse_repos' | 'repo_viewer'
+  const [userEmail, setUserEmail] = useState(null);
+  const [currentRepoId, setCurrentRepoId] = useState(null);
 
   useEffect(() => {
+    // Check for existing session
+    const savedEmail = localStorage.getItem('codebucket_user_email');
+    if (savedEmail) {
+      setUserEmail(savedEmail);
+      setView('dashboard');
+    }
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
@@ -15,8 +27,23 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleLogin = (email) => {
+    setUserEmail(email);
+    setView('dashboard');
+  };
+
+  const handleSignOut = () => {
+    localStorage.removeItem('codebucket_user_email');
+    setUserEmail(null);
+    setView('landing');
+  };
+
+  if (view === 'login') {
+    return <Login onLogin={handleLogin} onBack={() => setView('landing')} />;
+  }
+
   if (view === 'dashboard') {
-    return <Dashboard onSignOut={() => setView('landing')} onNewRepo={() => setView('new_repo')} />;
+    return <Dashboard onSignOut={handleSignOut} onNewRepo={() => setView('new_repo')} onBrowse={() => setView('browse_repos')} userEmail={userEmail} />;
   }
 
   if (view === 'new_repo') {
@@ -32,9 +59,21 @@ function App() {
             CodeBucket
           </div>
         </nav>
-        <NewRepository onCancel={() => setView('dashboard')} onCreateSuccess={() => setView('dashboard')} />
+        <NewRepository userEmail={userEmail} onCancel={() => setView('dashboard')} onCreateSuccess={() => setView('dashboard')} />
       </>
     );
+  }
+
+  if (view === 'browse_repos') {
+    return <BrowseRepositories
+      onBack={() => setView('dashboard')}
+      onNewRepo={() => setView('new_repo')}
+      onViewRepo={(id) => { setCurrentRepoId(id); setView('repo_viewer'); }}
+    />;
+  }
+
+  if (view === 'repo_viewer' && currentRepoId) {
+    return <RepositoryViewer repoId={currentRepoId} onBack={() => setView('dashboard')} />;
   }
   return (
     <div className="app-container">
@@ -55,8 +94,8 @@ function App() {
           <a href="#pricing" className="nav-item">Pricing</a>
         </div>
         <div className="nav-actions">
-          <button className="btn btn-outline" style={{ border: 'none' }} onClick={() => setView('dashboard')}>Sign In</button>
-          <button className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }} onClick={() => setView('dashboard')}>Sign Up</button>
+          <button className="btn btn-outline" style={{ border: 'none' }} onClick={() => setView('login')}>Sign In</button>
+          <button className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }} onClick={() => setView('login')}>Sign Up</button>
         </div>
       </nav>
 
@@ -71,7 +110,7 @@ function App() {
           </p>
           <div className="hero-cta">
             <input type="email" placeholder="Email address" className="hero-input" />
-            <button className="btn btn-primary">Sign up for CodeBucket</button>
+            <button className="btn btn-primary" onClick={() => setView('login')}>Sign up for CodeBucket</button>
           </div>
         </div>
 
